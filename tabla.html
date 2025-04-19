@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Táblázat CRUD</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <h1>Web-programozás-1 Előadás Házi feladat</h1>
+  </header>
+  <nav>
+    <ul>
+      <li><a href="index.html">Kezdőlap</a></li>
+      <li><a href="tabla.html" class="active">Táblázat</a></li>
+      <li><a href="html5.html">HTML5</a></li>
+      <li><a href="chartjs.html">ChartJS</a></li>
+      <li><a href="ajax.html">AJAX</a></li>
+      <li><a href="oojs.html">OOJS</a></li>
+<!-- <li><a href="react.html">React</a></li> -->
+    </ul>
+  </nav>
+  <aside>
+    <!-- Opcionális tartalom -->
+  </aside>
+  <div id="div-content">
+    <h2>Táblázat CRUD</h2>
+    <!-- Létrehozó/Frissítő űrlap -->
+    <form id="record-form">
+      <!-- Rejtett mező a rekord ID-hoz (szerkesztéshez) -->
+      <input type="hidden" id="record-id" value="">
+      <label>
+        Név:
+        <input type="text" id="name" required minlength="1" maxlength="30">
+      </label>
+      <label>
+        Magasság:
+        <input type="number" id="height" required>
+      </label>
+      <label>
+        Súly:
+        <input type="number" id="weight" required>
+      </label>
+      <button type="submit" id="form-button">Létrehoz</button>
+      <button type="button" id="cancel-update" style="display:none;">Mégse</button>
+    </form>
+    <!-- Szűrés -->
+    <input type="text" id="filter" placeholder="Szűrés...">
+    <!-- Táblázat, ahol a rekordok jelennek meg -->
+    <table id="crud-table" border="1">
+      <thead>
+        <tr>
+          <th data-column="id" data-order="desc">ID</th>
+          <th data-column="name" data-order="desc">Név</th>
+          <th data-column="height" data-order="desc">Magasság</th>
+          <th data-column="weight" data-order="desc">Súly</th>
+          <th>Műveletek</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Ide kerülnek a dinamikusan létrehozott sorok -->
+      </tbody>
+    </table>
+  </div>
+  <footer>
+    <p>Készítette: [Radványi Levente] – [CDOGV]</p>
+  </footer>
+  <script src="js/crud.js"></script>
+</body>
+</html>

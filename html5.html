@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="css/style.css">
+  <title>HTML5 API Demók</title>
+  <style>
+    /* Reset és alapbeállítások 
+    * { box-sizing: border-box; margin:0; padding:0; }
+    body { font-family: sans-serif; background:#f5f5f5; color:#333; }
+    header { background:#444; color:#fff; padding:1em; }
+    header h1 { margin-bottom:0.5em; font-size:1.5em; }
+    nav ul { list-style:none; display:flex; gap:1em; }
+    nav a { color:#ccc; text-decoration:none; }
+    nav a.active, nav a:hover { color:#fff; }*/
+
+    /* Rácsos elrendezés */
+    .api-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px,1fr));
+      gap:1em;
+      padding:1em;
+    }
+    .api-card {
+      background:#fff;
+      padding:1em;
+      border:1px solid #ddd;
+      border-radius:6px;
+      box-shadow:0 2px 4px rgba(0,0,0,0.1);
+    }
+    .api-card h2 { margin-bottom:0.5em; font-size:1.2em; }
+
+    /* Űrlap és lista stílusok */
+    .api-card form,
+    .api-card input,
+    .api-card button { display:block; margin:0.5em 0; width:100%; }
+    .api-card ul { margin-top:0.5em; list-style: disc inside; }
+
+    /* Kimeneti panelek */
+    #card-sse #sse-log,
+    #card-geo #geo-output,
+    #card-worker #worker-status,
+    #card-dnd #dnd-log {
+      margin-top:0.5em; padding:0.5em; background:#eef; border-radius:4px;
+    }
+
+    /* Drag & Drop */
+    #drag-item {
+      width:80px; height:80px; background:coral; margin-bottom:0.5em; cursor:grab;
+    }
+    #drop-zone {
+      width:100%; min-height:80px; border:2px dashed #aaa; padding:0.5em;
+    }
+
+    /* Canvas és SVG */
+    canvas { border:1px solid #ccc; display:block; margin:0.5em auto; }
+    #move-circle { margin-top:0.5em; }
+
+    footer {
+      text-align:center; padding:1em; background:#444; color:#ccc; margin-top:1em;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Web-programozás-1 Előadás Házi feladat</h1>
+  </header>
+    <nav>
+      <ul>
+        <li><a href="index.html">Kezdőlap</a></li>
+        <li><a href="tabla.html">Táblázat</a></li>
+        <li><a href="html5.html" class="active">HTML5</a></li>
+        <li><a href="chartjs.html">ChartJS</a></li>
+        <li><a href="ajax.html">AJAX</a></li>
+        <li><a href="oojs.html">OOJS</a></li>
+      </ul>
+    </nav>
+  
+
+  <main class="api-grid">
+    <!-- Web Storage -->
+    <section class="api-card" id="card-storage">
+      <h2>Web Storage (localStorage)</h2>
+      <form id="storage-form">
+        <input type="text" id="storage-key" placeholder="Kulcs" required>
+        <input type="text" id="storage-value" placeholder="Érték" required>
+        <button type="submit">Mentés</button>
+      </form>
+      <ul id="storage-list"></ul>
+    </section>
+
+    <!-- Web Worker -->
+    <section class="api-card" id="card-worker">
+      <h2>Web Worker (Prímszámok)</h2>
+      <input type="number" id="prime-limit" placeholder="Max szám" value="50000">
+      <button id="start-prime">Számolás indítása</button>
+      <p id="worker-status">Még nem indítva.</p>
+    </section>
+
+    <!-- SSE szimuláció -->
+    <section class="api-card" id="card-sse">
+      <h2>Server‑Sent Events (szimuláció)</h2>
+      <button id="start-sse">Események elindítása</button>
+      <div id="sse-log">Nincs esemény.</div>
+    </section>
+
+    <!-- Geolocation -->
+    <section class="api-card" id="card-geo">
+      <h2>Geolocation API</h2>
+      <button id="btn-geo">Helyzet lekérése</button>
+      <p id="geo-output">Még nincs lekérve.</p>
+    </section>
+
+    <!-- Drag & Drop -->
+    <section class="api-card" id="card-dnd">
+      <h2>Drag &amp; Drop</h2>
+      <div id="drag-item" draggable="true">Fogd és vidd!</div>
+      <div id="drop-zone">Ide dobd!</div>
+      <p id="dnd-log"></p>
+    </section>
+
+    <!-- Canvas -->
+    <section class="api-card" id="card-canvas">
+      <h2>Canvas (interaktív)</h2>
+      <canvas id="myCanvas" width="300" height="150"></canvas>
+      <p>Kattints a vászonra, és köröket rajzol.</p>
+    </section>
+
+    <!-- SVG -->
+    <section class="api-card" id="card-svg">
+      <h2>SVG (animáció)</h2>
+      <svg id="demo-svg" width="200" height="100">
+        <circle cx="50" cy="50" r="30" fill="lightgreen" stroke="darkgreen" stroke-width="2"/>
+      </svg>
+      <button id="move-circle">Mozgatás</button>
+    </section>
+  </main>
+
+  <footer>
+    <p>Készítette: Radványi Levente &ndash; CQDOGV</p>
+  </footer>
+
+  <script>
+    // ---- Web Storage ----
+    const storageForm = document.getElementById('storage-form'), storageList = document.getElementById('storage-list');
+    storageForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const key = document.getElementById('storage-key').value.trim();
+      const val = document.getElementById('storage-value').value.trim();
+      localStorage.setItem(key, val);
+      renderStorage(); storageForm.reset();
+    });
+    function renderStorage() {
+      storageList.innerHTML = '';
+      for(let i=0;i<localStorage.length;i++){
+        const k = localStorage.key(i), v = localStorage.getItem(k), li = document.createElement('li');
+        li.textContent = `${k}: ${v}`; storageList.appendChild(li);
+      }
+    }
+    renderStorage();
+
+    // ---- Web Worker (prímszám) ----
+    document.getElementById('start-prime').addEventListener('click',()=>{
+      const limit = +document.getElementById('prime-limit').value||10000;
+      document.getElementById('worker-status').textContent = 'Számolás...';
+      if(window.Worker){
+        const code = `self.onmessage=e=>{const n=e.data,sieve=[],primes=[];for(let i=2;i<=n;i++){if(!sieve[i]){primes.push(i);for(let j=i*i;j<=n;j+=i)sieve[j]=true;}}self.postMessage(primes.length+' prímszám '+n+'-ig.');}`;
+        const worker = new Worker(URL.createObjectURL(new Blob([code],{type:'text/js'})));
+        worker.onmessage = evt=>{document.getElementById('worker-status').textContent=evt.data;worker.terminate();};
+        worker.postMessage(limit);
+      } else document.getElementById('worker-status').textContent='Worker nem támogatott.';
+    });
+
+    // ---- SSE szimuláció ----
+    document.getElementById('start-sse').addEventListener('click',()=>{
+      const log=document.getElementById('sse-log'); let count=0;
+      log.textContent='Indul...';
+      const iv = setInterval(()=>{count++;log.textContent=`Új esemény #${count} @ ${new Date().toLocaleTimeString()}`;if(count>=5)clearInterval(iv);},2000);
+    });
+
+    // ---- Geolocation ----
+    document.getElementById('btn-geo').addEventListener('click',()=>{
+      const out=document.getElementById('geo-output');
+      if(navigator.geolocation){navigator.geolocation.getCurrentPosition(pos=>{out.textContent=`Szélesség: ${pos.coords.latitude.toFixed(4)}, Hosszúság: ${pos.coords.longitude.toFixed(4)}`;},err=>{out.textContent=`Hiba: ${err.message}`;});}
+      else out.textContent='Nem támogatott.';
+    });
+
+    // ---- Drag & Drop ----
+    const dragItem = document.getElementById('drag-item'), dropZone = document.getElementById('drop-zone'), dndLog = document.getElementById('dnd-log');
+    dragItem.addEventListener('dragstart',e=>e.dataTransfer.setData('text/plain','drag-item'));
+    dropZone.addEventListener('dragover',e=>e.preventDefault());
+    dropZone.addEventListener('drop',e=>{e.preventDefault();dropZone.appendChild(dragItem);dndLog.textContent='Sikeresen odadobva!';});
+
+    // ---- Canvas ----
+    const canvas=document.getElementById('myCanvas'),ctx=canvas.getContext('2d');
+    canvas.addEventListener('click',e=>{const rect=canvas.getBoundingClientRect(),x=e.clientX-rect.left,y=e.clientY-rect.top;
+      ctx.fillStyle=`hsl(${Math.random()*360},50%,60%)`;
+      ctx.beginPath();ctx.arc(x,y,15,0,2*Math.PI);ctx.fill();
+    });
+
+    // ---- SVG animáció ----
+    const circle=document.querySelector('#demo-svg circle'),btnMove=document.getElementById('move-circle');let dx=1;
+    btnMove.addEventListener('click',()=>{let cx=+circle.getAttribute('cx');cx+=dx*10;if(cx>180||cx<20)dx*=-1;circle.setAttribute('cx',cx);});
+  </script>
+</body>
+</html>

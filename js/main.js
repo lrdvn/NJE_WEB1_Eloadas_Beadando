@@ -1,0 +1,1 @@
+console.log("Alap main.js betöltve");

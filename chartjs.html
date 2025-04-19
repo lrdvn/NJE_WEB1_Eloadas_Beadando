@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ChartJS Példa – Színesítve</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <h1>Web-programozás-1 Előadás Házi feladat</h1>
+  </header>
+  <nav>
+    <ul>
+      <li><a href="index.html">Kezdőlap</a></li>
+      <li><a href="tabla.html">Táblázat</a></li>
+      <li><a href="html5.html">HTML5</a></li>
+      <li><a href="chartjs.html" class="active">ChartJS</a></li>
+      <li><a href="ajax.html">AJAX</a></li>
+      <li><a href="oojs.html">OOJS</a></li>
+    </ul>
+  </nav>
+  <aside></aside>
+  <div id="div-content">
+    <h2>5×5 Táblázat és Vonaldiagram</h2>
+    <table id="data-table">
+      <tbody><!-- JS generálja --></tbody>
+    </table>
+    <canvas id="chartCanvas" width="500" height="300"></canvas>
+  </div>
+  <footer>
+    <p>Készítette: [Radványi Levente] – [CDOGV]</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    // 5×5-ös mátrix generálása
+    const matrix = Array.from({length:5}, () =>
+      Array.from({length:5}, () => Math.floor(Math.random()*101))
+    );
+    const tableBody = document.querySelector('#data-table tbody');
+
+    function renderTable(data) {
+      tableBody.innerHTML = '';
+      data.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.addEventListener('click', () => updateChart(row));
+        row.forEach(cell => {
+          const td = document.createElement('td');
+          td.textContent = cell;
+          tr.appendChild(td);
+        });
+        tableBody.appendChild(tr);
+      });
+    }
+
+    // Chart.js inicializálása az első sorral, színes vonal és enyhe kitöltés
+    const ctx = document.getElementById('chartCanvas').getContext('2d');
+    let chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['A','B','C','D','E'],
+        datasets: [{
+          label: 'Sor adatai',
+          data: matrix[0],
+          borderColor: '#d64541',
+          backgroundColor: 'rgba(214,69,65,0.2)',
+          borderWidth: 3,
+          tension: 0.4,
+          pointBackgroundColor: '#d64541',
+          pointBorderColor: '#fff',
+          pointRadius: 5
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { labels: { color: '#333' } },
+          tooltip: { backgroundColor: 'rgba(0,0,0,0.7)' }
+        },
+        scales: {
+          x: { ticks: { color: '#4a90e2' } },
+          y: { beginAtZero: true, ticks: { color: '#4a90e2' } }
+        }
+      }
+    });
+
+    function updateChart(rowData) {
+      chart.data.datasets[0].data = rowData;
+      chart.update();
+    }
+
+    // Megjelenítés
+    renderTable(matrix);
+  </script>
+</body>
+</html>
